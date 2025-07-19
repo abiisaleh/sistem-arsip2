@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\DokumenKeluarResource\Pages;
 use App\Filament\Resources\DokumenKeluarResource\RelationManagers;
 use App\Models\DokumenKeluar;
+use Asmit\FilamentUpload\Forms\Components\AdvancedFileUpload;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -25,37 +26,42 @@ class DokumenKeluarResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
 
-    // protected static ?string $recordTitleAttribute = 'nomor';
+    protected static ?string $recordTitleAttribute = 'nomor';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nomor')
-                    ->unique()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('judul')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\DatePicker::make('tanggal')
-                    ->required(),
-                Forms\Components\Select::make('divisi_id')
-                    ->native(false)
-                    ->relationship('divisi','judul')
-                    ->createOptionForm([
-                        Forms\Components\TextInput::make('judul'),
-                    ])
-                    ->searchable()
-                    ->preload(),
-                Forms\Components\Textarea::make('deskripsi')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\FileUpload::make('file')
-                    ->downloadable()
+                Forms\Components\Group::make([
+                    Forms\Components\TextInput::make('nomor')
+                        ->unique()
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('judul')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\DatePicker::make('tanggal')
+                        ->required(),
+                    Forms\Components\Select::make('divisi_id')
+                        ->native(false)
+                        ->relationship('divisi','judul')
+                        ->createOptionForm([
+                            Forms\Components\TextInput::make('judul'),
+                        ])
+                        ->searchable()
+                        ->preload(),
+                    Forms\Components\Textarea::make('deskripsi')
+                        ->required()
+                        ->maxLength(255),
+                ]),
+                AdvancedFileUpload::make('file')
                     ->openable()
-                    ->acceptedFileTypes(['application/pdf'])
-                    ->required(),
+                    ->acceptedFileTypes(['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.wordprocessingml.spreadsheetml.sheet'])
+                    ->pdfDisplayPage(1)
+                    ->pdfToolbar(false)
+                    ->pdfNavPanes(false)
+                    ->pdfPreviewHeight(450)
+                    ->required()
             ]);
     }
 
@@ -71,12 +77,9 @@ class DokumenKeluarResource extends Resource
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('deskripsi')
+                    ->hidden()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('user.name')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('divisi.judul')
-                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

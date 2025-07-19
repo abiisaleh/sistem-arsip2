@@ -40,8 +40,9 @@ class DepartemenResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('judul')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('deskripsi')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('document_count')
+                    ->label('Total Dokumen')
+                    ->counts('dokumen'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

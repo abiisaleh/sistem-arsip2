@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\DokumenMasukResource\Pages;
 use App\Filament\Resources\DokumenMasukResource\RelationManagers;
 use App\Models\DokumenMasuk;
+use Asmit\FilamentUpload\Forms\Components\AdvancedFileUpload;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -29,30 +30,35 @@ class DokumenMasukResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nomor')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('judul')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\DatePicker::make('tanggal')
-                    ->required(),
-                Forms\Components\Select::make('departemen_id')
-                    ->native(false)
-                    ->relationship('departemen','judul')
-                    ->createOptionForm([
-                        Forms\Components\TextInput::make('judul'),
-                    ])
-                    ->searchable()
-                    ->preload(),
-                Forms\Components\Textarea::make('deskripsi')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\FileUpload::make('file')
-                    ->downloadable()
+                Forms\Components\Group::make([
+                    Forms\Components\TextInput::make('nomor')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('judul')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\DatePicker::make('tanggal')
+                        ->required(),
+                    Forms\Components\Select::make('departemen_id')
+                        ->native(false)
+                        ->relationship('departemen','judul')
+                        ->createOptionForm([
+                            Forms\Components\TextInput::make('judul'),
+                        ])
+                        ->searchable()
+                        ->preload(),
+                    Forms\Components\Textarea::make('deskripsi')
+                        ->required()
+                        ->maxLength(255),
+                ]),
+                AdvancedFileUpload::make('file')
                     ->openable()
-                    ->acceptedFileTypes(['application/pdf'])
-                    ->required(),
+                    ->acceptedFileTypes(['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.wordprocessingml.spreadsheetml.sheet'])
+                    ->pdfDisplayPage(1)
+                    ->pdfToolbar(false)
+                    ->pdfNavPanes(false)
+                    ->pdfPreviewHeight(450)
+                    ->required()
             ]);
     }
 
@@ -68,14 +74,9 @@ class DokumenMasukResource extends Resource
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('deskripsi')
+                    ->hidden()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('file')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('user.name')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('departemen.judul')
-                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
