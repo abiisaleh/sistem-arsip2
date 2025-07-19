@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('tanggal');
             $table->string('deskripsi');
             $table->string('file');
+            $table->bool('is_private')->default(true);
             $table->foreignIdFor(User::class)->nullable()->constrained()->nullOnDelete();
             $table->foreignIdFor(Divisi::class)->nullable()->constrained()->nullOnDelete();
             $table->timestamps();
