@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e09194427f73a07586714a0537d2d756",
+    "content-hash": "9af50cb7dfddced0dbf046f5f31d03d6",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -71,6 +71,53 @@
                 "source": "https://github.com/AnourValar/eloquent-serialize/tree/1.3.3"
             },
             "time": "2025-05-28T17:07:28+00:00"
+        },
+        {
+            "name": "asmit/filament-upload",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/AsmitNepali/filament-upload.git",
+                "reference": "8ff53bda4ef22e87c6efbded0341e99e69363b54"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/AsmitNepali/filament-upload/zipball/8ff53bda4ef22e87c6efbded0341e99e69363b54",
+                "reference": "8ff53bda4ef22e87c6efbded0341e99e69363b54",
+                "shasum": ""
+            },
+            "require": {
+                "filament/support": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Asmit\\FilamentUpload\\FilamentUploadServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Asmit\\FilamentUpload\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "AsmitNepali",
+                    "email": "mail2asmitnepali@gmail.com"
+                }
+            ],
+            "description": "Filament PDF file upload and preview.",
+            "support": {
+                "issues": "https://github.com/AsmitNepali/filament-upload/issues",
+                "source": "https://github.com/AsmitNepali/filament-upload/tree/v1.0.2"
+            },
+            "time": "2025-06-30T11:22:18+00:00"
         },
         {
             "name": "blade-ui-kit/blade-heroicons",
