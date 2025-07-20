@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('judul');
             $table->date('tanggal');
             $table->string('deskripsi');
+            $table->bool('is_private')->default(true);
             $table->string('file');
             $table->boolean('is_private')->default(false);
             $table->foreignIdFor(User::class)->nullable()->constrained()->nullOnDelete();

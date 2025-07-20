@@ -45,7 +45,7 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
+    
     public function divisi()
     {
         return $this->belongsTo(Divisi::class);
