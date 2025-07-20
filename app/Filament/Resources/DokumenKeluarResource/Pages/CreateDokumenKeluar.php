@@ -13,6 +13,11 @@ class CreateDokumenKeluar extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['user_id'] = auth()->id();
+        
+        if (auth()->user()->divisi!= null){
+            $data['divisi_id'] = auth()->user()->divisi->id;
+        }
+        
 
         return $data;
     }
