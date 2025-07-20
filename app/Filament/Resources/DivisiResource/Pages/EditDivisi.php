@@ -4,16 +4,16 @@ namespace App\Filament\Resources\DivisiResource\Pages;
 
 use App\Filament\Resources\DivisiResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ManageRecords;
+use Filament\Resources\Pages\EditRecord;
 
-class ManageDivisis extends ManageRecords
+class EditDivisi extends EditRecord
 {
     protected static string $resource = DivisiResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\DeleteAction::make(),
         ];
     }
 }

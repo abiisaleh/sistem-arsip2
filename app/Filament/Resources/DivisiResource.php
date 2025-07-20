@@ -67,10 +67,19 @@ class DivisiResource extends Resource
             ]);
     }
 
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\UsersRelationManager::class
+        ];
+    }
+
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageDivisis::route('/'),
+            'index' => Pages\ListDivisis::route('/'),
+            'create' => Pages\CreateDivisi::route('/create'),
+            'edit' => Pages\EditDivisi::route('/{record}/edit'),
         ];
     }
 

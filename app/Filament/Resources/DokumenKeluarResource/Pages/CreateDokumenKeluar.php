@@ -14,11 +14,10 @@ class CreateDokumenKeluar extends CreateRecord
     {
         $data['user_id'] = auth()->id();
         
-        if (auth()->user()->divisi!= null){
+        if (auth()->user()->divisi != null){
             $data['divisi_id'] = auth()->user()->divisi->id;
         }
         
-
         return $data;
     }
 }
