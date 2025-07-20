@@ -48,6 +48,7 @@ class DokumenKeluarResource extends Resource
                         ->createOptionForm([
                             Forms\Components\TextInput::make('judul'),
                         ])
+                        ->hidden(fn () => auth()->user()->divisi == null)
                         ->searchable()
                         ->preload(),
                     Forms\Components\Textarea::make('deskripsi')
@@ -95,7 +96,7 @@ class DokumenKeluarResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

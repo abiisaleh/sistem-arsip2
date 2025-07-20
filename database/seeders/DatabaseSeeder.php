@@ -27,5 +27,12 @@ class DatabaseSeeder extends Seeder
                 'judul' => $judul
             ]);
         }
+
+        User::factory()->create([
+            'name' => 'Keuangan',
+            'email' => 'Keuangan@gmail.com',
+            'divisi_id' => 6,
+
+        ]);
     }
 }
