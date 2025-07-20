@@ -48,7 +48,7 @@ class DokumenKeluarResource extends Resource
                         ->createOptionForm([
                             Forms\Components\TextInput::make('judul'),
                         ])
-                        ->hidden(fn () => auth()->user()->divisi == null)
+                        ->hidden(auth()->user()->divisi != null)
                         ->searchable()
                         ->preload(),
                     Forms\Components\Textarea::make('deskripsi')

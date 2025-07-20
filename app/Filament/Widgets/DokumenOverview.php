@@ -14,7 +14,7 @@ class DokumenOverview extends BaseWidget
     {
         return [
             Stat::make('Dokumen Masuk', DokumenMasuk::all()->count()),
-            Stat::make('Dokumen Keluar','33'),
+            Stat::make('Dokumen Keluar', DokumenKeluar::all()->count()),
         ];
     }
 }
