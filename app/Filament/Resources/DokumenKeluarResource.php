@@ -53,6 +53,11 @@ class DokumenKeluarResource extends Resource
                     Forms\Components\Textarea::make('deskripsi')
                         ->required()
                         ->maxLength(255),
+                    Forms\Components\Toggle::make('is_private')
+                        ->onIcon('heroicon-o-lock-closed')
+                        ->offIcon('heroicon-o-lock-open')
+                        ->required()
+                        ->default(false)
                 ]),
                 AdvancedFileUpload::make('file')
                     ->openable()
@@ -68,6 +73,10 @@ class DokumenKeluarResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                if (auth()->user()->divisi_id != null)
+                    $query->where('divisi_id', auth()->user()->divisi_id)->orWhere('is_private',false);
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('nomor')
                     ->searchable(),

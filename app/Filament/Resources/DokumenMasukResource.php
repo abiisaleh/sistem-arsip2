@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\DokumenMasukResource\Pages;
 use App\Filament\Resources\DokumenMasukResource\RelationManagers;
 use App\Models\DokumenMasuk;
+use App\Models\User;
 use Asmit\FilamentUpload\Forms\Components\AdvancedFileUpload;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -50,6 +51,11 @@ class DokumenMasukResource extends Resource
                     Forms\Components\Textarea::make('deskripsi')
                         ->required()
                         ->maxLength(255),
+                    Forms\Components\Toggle::make('is_private')
+                        ->onIcon('heroicon-o-lock-closed')
+                        ->offIcon('heroicon-o-lock-open')
+                        ->required()
+                        ->default(false)
                 ]),
                 AdvancedFileUpload::make('file')
                     ->openable()
@@ -65,6 +71,10 @@ class DokumenMasukResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                if (auth()->user()->divisi_id != null)
+                    $query->whereBelongsTo(User::all()->where('divisi_id', auth()->user()->divisi_id))->orWhere('is_private',false);
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('nomor')
                     ->searchable(),
