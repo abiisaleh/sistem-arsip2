@@ -94,29 +94,17 @@ class DivisiResource extends Resource
 
     public static function canEdit(Model $record): bool
     {
-        if (auth()->user()->divisi == null) {
-            return true;
-        }
-
-        return false;
+        return auth()->user()->divisi == null;
     }
 
     public static function canDelete(Model $record): bool
     {
-        if (auth()->user()->divisi == null) {
-            return true;
-        }
-
-        return false;
+        return auth()->user()->divisi == null;
     }
 
     public static function canDeleteAny(): bool
     {
-        if (auth()->user()->divisi == null) {
-            return true;
-        }
-
-        return false;
+        return auth()->user()->divisi == null;
     }
     
 }

@@ -35,6 +35,7 @@ class DokumenKeluarResource extends Resource
                 Forms\Components\Group::make([
                     Forms\Components\TextInput::make('nomor')
                         ->unique()
+                        ->hiddenOn(['edit','view'])
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('judul')
@@ -91,6 +92,7 @@ class DokumenKeluarResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('divisi.judul')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('user.name'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -139,5 +141,20 @@ class DokumenKeluarResource extends Resource
     public static function getGloballySearchableAttributes(): array
     {
         return ['nomor','judul','deskripsi','divisi.judul'];
+    }
+    
+    public static function canEdit(Model $record): bool
+    {
+        return $record->user->id == auth()->user()->id;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+       return $record->user->id == auth()->user()->id;
+    }
+    
+    public static function canDeleteAny(): bool
+    {
+        return auth()->user()->divisi == null;
     }
 }

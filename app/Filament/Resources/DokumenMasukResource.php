@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Eloquent\Model;
 
 class DokumenMasukResource extends Resource
 {
@@ -33,6 +34,8 @@ class DokumenMasukResource extends Resource
             ->schema([
                 Forms\Components\Group::make([
                     Forms\Components\TextInput::make('nomor')
+                        ->unique()
+                        ->hiddenOn(['edit','view'])
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('judul')
@@ -88,6 +91,7 @@ class DokumenMasukResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('departemen.judul')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('user.name'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -102,7 +106,7 @@ class DokumenMasukResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                //Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -131,5 +135,20 @@ class DokumenMasukResource extends Resource
     public static function getGloballySearchableAttributes(): array
     {
         return ['nomor','judul','deskripsi','departemen.judul'];
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return $record->user->id == auth()->user()->id;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+       return $record->user->id == auth()->user()->id;
+    }
+    
+    public static function canDeleteAny(): bool
+    {
+        return auth()->user()->divisi == null;
     }
 }
