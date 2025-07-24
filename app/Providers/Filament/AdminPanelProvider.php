@@ -28,9 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->profile()
             ->login()
-            ->brandLogo('/img/logo-dishub.png')
-            ->brandLogoHeight('40px')
-            ->brandName(config('app.name'))
+            ->brandLogo(fn () => view('filament.admin.logo'))
             ->colors([
                 'primary' => Color::Amber,
             ])
