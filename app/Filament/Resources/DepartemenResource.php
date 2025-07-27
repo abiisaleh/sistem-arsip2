@@ -72,4 +72,9 @@ class DepartemenResource extends Resource
             'index' => Pages\ManageDepartemens::route('/'),
         ];
     }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
 }

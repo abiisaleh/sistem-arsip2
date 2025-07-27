@@ -18,7 +18,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('role',['admin','verifikator','user'])->default('user');
             $table->foreignIdFor(Divisi::class)->nullable()->constrained()->nullOnDelete();
+            $table->string('file_signature')->nullable()->default(null);
             $table->rememberToken();
             $table->timestamps();
         });

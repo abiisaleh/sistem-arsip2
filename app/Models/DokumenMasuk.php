@@ -9,6 +9,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class DokumenMasuk extends Model
 {
+    protected function casts(): array
+    {
+        return [
+            'tanggal' => 'datetime',
+        ];
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -17,5 +24,10 @@ class DokumenMasuk extends Model
     public function departemen()
     {
         return $this->belongsTo(Departemen::class);
+    }
+
+    public function divisi()
+    {
+    return $this->belongsToMany(Divisi::class,'dokumen_masuk_divisi');
     }
 }

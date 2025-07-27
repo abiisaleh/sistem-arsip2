@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\DokumenMasukResource\Pages;
-use App\Filament\Resources\DokumenMasukResource\RelationManagers;
 use App\Models\DokumenMasuk;
 use App\Models\User;
 use Asmit\FilamentUpload\Forms\Components\AdvancedFileUpload;
@@ -32,6 +31,23 @@ class DokumenMasukResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Section::make()
+                    ->columns(3)
+                    ->schema([
+                        Forms\Components\Placeholder::make('Dibuat')
+                            ->content(fn (DokumenMasuk $record) => $record->created_at),
+                        Forms\Components\Placeholder::make('Diverifikasi')
+                            ->hintAction( fn (DokumenMasuk $record) => 
+                                Forms\Components\Actions\Action::make('lihat_disposisi')
+                                    ->url(asset('storage/'.$record->file_disposisi))
+                                    ->openUrlInNewTab()
+                                    ->icon('heroicon-m-eye')
+                                    ->hidden(is_null($record->file_disposisi))
+                            )
+                            ->content(fn (DokumenMasuk $record) => $record->verified_at ?? 'Menunggu verifikasi'),
+                        Forms\Components\Placeholder::make('Diarsipkan')
+                            ->content(fn (DokumenMasuk $record) => $record->archive_at ?? 'Belum')
+                    ])->hiddenOn('create'),
                 Forms\Components\Group::make([
                     Forms\Components\TextInput::make('nomor')
                         ->unique()
@@ -75,8 +91,8 @@ class DokumenMasukResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function (Builder $query) {
-                if (auth()->user()->divisi_id != null)
-                    $query->whereBelongsTo(User::all()->where('divisi_id', auth()->user()->divisi_id))->orWhere('is_private',false);
+                if (auth()->user()->role == 'user')
+                    $query->whereBelongsTo(User::all()->where('divisi_id', auth()->user()->divisi_id))->where('verified_at','!=',null)->where('is_private',false);
             })
             ->columns([
                 Tables\Columns\TextColumn::make('nomor')
@@ -91,7 +107,11 @@ class DokumenMasukResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('departemen.judul')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('user.name'),
+                Tables\Columns\TextColumn::make('divisi.judul'),
+                Tables\Columns\TextColumn::make('sifat'),
+                Tables\Columns\IconColumn::make('is_private')
+                    ->hidden(fn () => auth()->user()->role == 'user')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -137,18 +157,36 @@ class DokumenMasukResource extends Resource
         return ['nomor','judul','deskripsi','departemen.judul'];
     }
 
+    public static function canCreate(): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
+
     public static function canEdit(Model $record): bool
     {
-        return $record->user->id == auth()->user()->id;
+        return auth()->user()->role === 'admin';
     }
 
     public static function canDelete(Model $record): bool
     {
-       return $record->user->id == auth()->user()->id;
+       return auth()->user()->role === 'admin';
     }
     
     public static function canDeleteAny(): bool
     {
-        return auth()->user()->divisi == null;
+        return auth()->user()->role === 'admin';
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        if (auth()->user()->role == 'verifikator')
+            return DokumenMasuk::all()->where('verified_at',null)->count();
+
+        if (auth()->user()->role == 'admin') {
+            $record = DokumenMasuk::all()->where('verified_at','!=',null)->count();
+            return ($record != 0) ? $record : '';
+        }
+        
+        return '';
     }
 }

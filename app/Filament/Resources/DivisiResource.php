@@ -106,5 +106,10 @@ class DivisiResource extends Resource
     {
         return auth()->user()->divisi == null;
     }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
     
 }

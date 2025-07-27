@@ -20,6 +20,13 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Admin',
             'email' => 'admin@demo.com',
+            'role' => 'admin'
+        ]);
+
+        User::factory()->create([
+            'name' => 'Pimpinan',
+            'email' => 'master@demo.com',
+            'role' => 'verifikator'
         ]);
 
         $judulDivisi = ['KSBU','KTOKPD','KASI JASA','BLU','SPI','PENGELOLA ANGGARAN'];
@@ -30,8 +37,9 @@ class DatabaseSeeder extends Seeder
             ]);
 
             User::factory()->create([
-                'name' => $judul.' Admin',
+                'name' => $judul.' user',
                 'email' => Str::slug($judul).'@demo.com',
+                'role' => 'user',
                 'divisi_id' => $i++
             ]);
         }
