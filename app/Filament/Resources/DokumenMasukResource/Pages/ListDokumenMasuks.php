@@ -22,12 +22,14 @@ class ListDokumenMasuks extends ListRecords
 
     public function getTabs(): array
     {
-        if (auth()->user()->role != 'user')
-            return [
-                'dibuat' => Tab::make()->modifyQueryUsing(fn (Builder $query) => $query->where('verified_at', null)),
-                'diverifikasi' => Tab::make()->modifyQueryUsing(fn (Builder $query) => $query->where('verified_at', '!=',null)),
-                'diarsipkan' => Tab::make()->modifyQueryUsing(fn (Builder $query) => $query->where('archive_at', '!=',null)),
-            ];
-        return [];
+        if (auth()->user()->role == 'user')
+            return [];
+    
+        return [
+            'dibuat' => Tab::make()->modifyQueryUsing(fn (Builder $query) => $query->where('verified_at', null)),
+            'diverifikasi' => Tab::make()->modifyQueryUsing(fn (Builder $query) => $query->where('verified_at', '!=',null)->where('archive_at',null)),
+            'diarsipkan' => Tab::make()->modifyQueryUsing(fn (Builder $query) => $query->where('archive_at', '!=',null)),
+        ];
+        
     }
 }

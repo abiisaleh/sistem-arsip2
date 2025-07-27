@@ -3,17 +3,23 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\DokumenMasukResource\Pages;
+use App\Models\Divisi;
 use App\Models\DokumenMasuk;
 use App\Models\User;
 use Asmit\FilamentUpload\Forms\Components\AdvancedFileUpload;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Filament\Actions\StaticAction;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class DokumenMasukResource extends Resource
 {
@@ -37,12 +43,26 @@ class DokumenMasukResource extends Resource
                         Forms\Components\Placeholder::make('Dibuat')
                             ->content(fn (DokumenMasuk $record) => $record->created_at),
                         Forms\Components\Placeholder::make('Diverifikasi')
+                            ->key('verifikasi-disposisi')
                             ->hintAction( fn (DokumenMasuk $record) => 
                                 Forms\Components\Actions\Action::make('lihat_disposisi')
-                                    ->url(asset('storage/'.$record->file_disposisi))
-                                    ->openUrlInNewTab()
+                                    ->infolist(function (DokumenMasuk $record) {
+                                        return Infolist::make()
+                                            ->record($record)
+                                            ->schema([
+                                                Infolists\Components\TextEntry::make('sifat'),
+                                                Infolists\Components\TextEntry::make('divisi.judul'),
+                                                Infolists\Components\TextEntry::make('isi_disposisi'),
+                                                Infolists\Components\TextEntry::make('catatan_disposisi'),
+                                            ]);
+                                    })
+                                    ->modalWidth('md')
+                                    ->action(fn () => response()->download('storage/'.$record->file_disposisi))
+                                    ->modalCancelAction(false)
+                                    ->modalSubmitActionLabel('Download')
                                     ->icon('heroicon-m-eye')
                                     ->hidden(is_null($record->file_disposisi))
+                                    ->modal()
                             )
                             ->content(fn (DokumenMasuk $record) => $record->verified_at ?? 'Menunggu verifikasi'),
                         Forms\Components\Placeholder::make('Diarsipkan')
@@ -71,6 +91,7 @@ class DokumenMasukResource extends Resource
                         ->required()
                         ->maxLength(255),
                     Forms\Components\Toggle::make('is_private')
+                        ->hidden(fn () => auth()->user()->role == 'user')
                         ->onIcon('heroicon-o-lock-closed')
                         ->offIcon('heroicon-o-lock-open')
                         ->required()
@@ -92,7 +113,9 @@ class DokumenMasukResource extends Resource
         return $table
             ->modifyQueryUsing(function (Builder $query) {
                 if (auth()->user()->role == 'user')
-                    $query->whereBelongsTo(User::all()->where('divisi_id', auth()->user()->divisi_id))->where('verified_at','!=',null)->where('is_private',false);
+                    $query->whereAttachedTo(Divisi::find(auth()->user()->divisi_id), 'divisi')
+                        ->where('verified_at','!=',null)
+                        ->where('is_private',false);
             })
             ->columns([
                 Tables\Columns\TextColumn::make('nomor')
@@ -107,7 +130,6 @@ class DokumenMasukResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('departemen.judul')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('divisi.judul'),
                 Tables\Columns\TextColumn::make('sifat'),
                 Tables\Columns\IconColumn::make('is_private')
                     ->hidden(fn () => auth()->user()->role == 'user')
@@ -179,11 +201,13 @@ class DokumenMasukResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        if (auth()->user()->role == 'verifikator')
-            return DokumenMasuk::all()->where('verified_at',null)->count();
+        if (auth()->user()->role == 'verifikator'){
+            $record = DokumenMasuk::all()->where('verified_at',null)->count();
+            return ($record != 0) ? $record : '';
+        }
 
         if (auth()->user()->role == 'admin') {
-            $record = DokumenMasuk::all()->where('verified_at','!=',null)->count();
+            $record = DokumenMasuk::all()->where('verified_at','!=',null)->where('archive_at',null)->count();
             return ($record != 0) ? $record : '';
         }
         

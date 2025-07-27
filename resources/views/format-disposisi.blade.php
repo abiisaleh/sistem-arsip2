@@ -38,7 +38,7 @@ $svg = '<svg
   }
   td, th {
     border: 1px solid black;
-    padding: 8px;
+    padding: 4px;
     vertical-align: top;
   }
 </style>
@@ -48,27 +48,25 @@ $svg = '<svg
   <table>
     <tr>
         <td colspan="3" style=" text-align:center;">
-            <div style="display: inline; margin-inline-start: -100px">
-                <img src="data:image/svg+xml;base64,{{ base64_encode($svg) }}" style="width: 50px; margin: -10px 10px;">
-                <h3 style="display: inline-block;">
-                    KANTOR UPBU KELAS II MOZES KILANGIN – TIMIKA<br>LEMBAR DISPOSISI
-                </h3>
-            </div>
+            <img src="data:image/svg+xml;base64,{{ base64_encode($svg) }}" style="width: 50px; display:inline; margin-right:10px">
+            <h3 style="display: inline-block; margin-right:60px; vertical-align:middle">
+                KANTOR UPBU KELAS II MOZES KILANGIN – TIMIKA<br>LEMBAR DISPOSISI
+            </h3>
         </td>
     </tr>
     <tr>
-        <td style="width: 200px;">No :</td>
-        <td colspan="2">Dari :</td>
+        <td style="width: 200px;">No : {{$id}}</td>
+        <td colspan="2">Dari : {{$departemen}}</td>
     </tr>
     <tr>
         <td rowspan="3">Surat diterima</td>
-        <td colspan="2">No Surat :</td>
+        <td colspan="2">No Surat : {{$nomor}}</td>
     </tr>
     <tr>
-        <td colspan="2">Diterima :</td>
+        <td colspan="2">Diterima : {{$tanggal}}</td>
     </tr>
     <tr>
-        <td colspan="2">Perihal :</td>
+        <td colspan="2">Perihal : {{$deskripsi}}</td>
     </tr>
     <tr>
         <td>Kode penerima</td>
@@ -77,29 +75,26 @@ $svg = '<svg
 
     <tr>
         <td colspan="3">
-            <p>Sifat Disposisi</p>
-            <p>Segera</p>
-            <h4>Kepada, Yth..</h4>
-            <p>KSBU</p>
+            <p>Sifat Disposisi <br>{{$sifat}}</p>
+            <h4>Kepada, Yth.. <br>{{$divisi}}</h4>
         </td>
     </tr>
 
     <tr>
         <td colspan="3">
-            <h4>Isi Disposisi :</h4>
-            <p>Selesaikan</p>
+            <h4>Isi Disposisi : <br>{{$isi}}</h4>
         </td>
     </tr>
 
     <tr>
         <td colspan="2">
             <h4>Catatan Disposisi :</h4>
-            <p>Selesaikan</p>
+            <p>{{$catatan}}</p>
         </td>
         <td style="width: 250px; text-align:center">
-            <p>tanggal</p>
+            <p>{{$verified_at}}</p>
             <p>Kepala Kantor</p>
-            <p>Nama</p>
+            <p>{{$name}}</p>
         </td>
     </tr>
   </table>
