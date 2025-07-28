@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('divisis', function (Blueprint $table) {
             $table->id();
             $table->string('judul');
-            $table->string('deskripsi')->nullable();
+            $table->string('bagian')->nullable();
             $table->timestamps();
         });
     }

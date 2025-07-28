@@ -57,10 +57,8 @@ class DokumenMasukResource extends Resource
                                             ]);
                                     })
                                     ->modalWidth('md')
-                                    ->action(fn () => response()->download('storage/'.$record->file_disposisi))
                                     ->modalCancelAction(false)
-                                    ->modalSubmitActionLabel('Download')
-                                    ->icon('heroicon-m-eye')
+                                    ->modalSubmitAction(false)
                                     ->hidden(is_null($record->file_disposisi))
                                     ->modal()
                             )
@@ -78,6 +76,7 @@ class DokumenMasukResource extends Resource
                         ->required()
                         ->maxLength(255),
                     Forms\Components\DatePicker::make('tanggal')
+                        ->format('d F Y')
                         ->required(),
                     Forms\Components\Select::make('departemen_id')
                         ->native(false)
@@ -201,16 +200,15 @@ class DokumenMasukResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        if (auth()->user()->role == 'verifikator'){
+        if (auth()->user()->role == 'verifikator')
             $record = DokumenMasuk::all()->where('verified_at',null)->count();
-            return ($record != 0) ? $record : '';
-        }
-
-        if (auth()->user()->role == 'admin') {
-            $record = DokumenMasuk::all()->where('verified_at','!=',null)->where('archive_at',null)->count();
-            return ($record != 0) ? $record : '';
-        }
         
-        return '';
+        if (auth()->user()->role == 'admin') 
+            $record = DokumenMasuk::all()->where('verified_at','!=',null)->where('archive_at',null)->count();
+        
+        if (auth()->user()->role == 'user') 
+            $record = 0;
+        
+        return ($record != 0) ? $record : '';
     }
 }

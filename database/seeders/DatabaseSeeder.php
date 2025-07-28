@@ -29,7 +29,11 @@ class DatabaseSeeder extends Seeder
             'role' => 'verifikator'
         ]);
 
-        $judulDivisi = ['KSBU','KTOKPD','KASI JASA','BLU','SPI','PENGELOLA ANGGARAN'];
+        $judulDivisi = [
+            'KSBU',
+            'KTOKPD',
+            'KASI JASA',
+        ];
         $i = 1;
         foreach ($judulDivisi as $judul) {
             Divisi::create([

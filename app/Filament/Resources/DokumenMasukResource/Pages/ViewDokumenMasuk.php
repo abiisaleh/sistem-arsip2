@@ -17,6 +17,8 @@ use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\Settings;
 use PhpOffice\PhpWord\TemplateProcessor;
 
+use function Livewire\store;
+
 class ViewDokumenMasuk extends ViewRecord
 {
     protected static string $resource = DokumenMasukResource::class;
@@ -105,10 +107,11 @@ class ViewDokumenMasuk extends ViewRecord
                             'verified_at' => date('d F Y'),
                             'name' => auth()->user()->name,
                         ]);
+                        $fileName="disposisi-{$this->file}";
                         $pdf->setPaper('A4');
-                        $pdf->save("storage/disposisi-{$this->record->nomor}.pdf");
+                        $pdf->save("storage/{$fileName}");
 
-                        $this->record->update(['file_disposisi' => "disposisi-{$this->record->nomor}.pdf"]);
+                        $this->record->update(['file_disposisi' => $fileName]);
                     }
 
                     return Notification::make()->title(__('filament-panels::resources/pages/edit-record.notifications.saved.title'))->success()->send();
@@ -120,13 +123,38 @@ class ViewDokumenMasuk extends ViewRecord
                 ->action(function () {
                     $this->record->update(['archive_at' => now()]);
                     Notification::make()->title(__('filament-panels::resources/pages/edit-record.notifications.saved.title'))->success()->send(); 
-                    return Storage::download('/storage/'.$this->record->file_disposisi); 
+                    return Storage::download('storage/'.$this->record->file_disposisi); 
                 })
                 ->hidden(fn () => is_null($this->record->verified_at) or !is_null($this->record->archive_at))
                 ->color('success'),
 
             Actions\EditAction::make()
                 ->hidden(fn () => !is_null($this->record->verified_at)),
+
+            Actions\DeleteAction::make()
+                ->after( function () {
+                    if (Storage::disk('public')->exists($this->record->file))
+                        return Storage::disk('public')->delete($this->record->file);
+
+                    if (Storage::disk('public')->exists($this->record->file_disposisi))
+                        return Storage::disk('public')->delete($this->record->file_disposisi);
+                })
+                ->visible(fn () => auth()->user()->role == 'admin')
+                ->hidden(function () {
+                    //kalau belum verifikasi tampilkan
+                    if ($this->record->verified_at == null)
+                        $hidden = false;
+                    
+                    //kalau sudah verifikasi sembunyikan
+                    else 
+                        $hidden = true;
+
+                    //kalau sudah di arsip tampilkan
+                    if ($this->record->archive_at != null)
+                        $hidden = false;
+
+                    return $hidden;
+                })
         ];
     }
 }

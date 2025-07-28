@@ -25,7 +25,7 @@ return new class extends Migration
             $table->foreignIdFor(User::class)->nullable()->constrained()->nullOnDelete();
 
             $table->foreignIdFor(Departemen::class)->nullable()->constrained()->nullOnDelete();
-            $table->string('sifat');
+            $table->string('sifat')->nullable()->default(null);
             $table->string('isi_disposisi')->nullable()->default(null);
             $table->string('catatan_disposisi')->nullable()->default(null);
             $table->dateTime('verified_at')->nullable()->default(null);

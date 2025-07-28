@@ -17,9 +17,4 @@
     .fi-sidebar-nav {
         @apply bg-white dark:bg-gray-900 shadow;
     }
-
-    .fi-sidebar-open {
-        @apply w-[18rem];
-    }
-
 }

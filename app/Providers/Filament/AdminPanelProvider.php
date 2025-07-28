@@ -33,6 +33,8 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->profile(EditProfile::class)
             ->login(Login::class)
+            ->passwordReset()
+            ->emailVerification()
             ->darkMode(false)
             ->userMenuItems([
                 MenuItem::make()->label('Users')->icon('heroicon-m-users')->url(fn () => UserResource::getUrl())->visible(fn () => auth()->user()->role == 'admin')

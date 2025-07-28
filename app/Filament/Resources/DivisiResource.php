@@ -27,9 +27,10 @@ class DivisiResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('judul')
+                    ->autocomplete(fn () => Divisi::all()->groupBy('judul')->pluck('judul')->toArray())
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('deskripsi')
+                Forms\Components\TextInput::make('bagian')
                     ->required()
                     ->maxLength(255),
             ]);
