@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\DokumenKeluarResource\Pages;
+namespace App\Filament\Resources\SuratKeluarResource\Pages;
 
-use App\Filament\Resources\DokumenKeluarResource;
+use App\Filament\Resources\SuratKeluarResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditDokumenKeluar extends EditRecord
+class EditSuratKeluar extends EditRecord
 {
-    protected static string $resource = DokumenKeluarResource::class;
+    protected static string $resource = SuratKeluarResource::class;
 
     protected function getHeaderActions(): array
     {

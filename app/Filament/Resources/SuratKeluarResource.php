@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\DokumenKeluarResource\Pages;
-use App\Filament\Resources\DokumenKeluarResource\RelationManagers;
-use App\Models\DokumenKeluar;
+use App\Filament\Resources\SuratKeluarResource\Pages;
+use App\Filament\Resources\SuratKeluarResource\RelationManagers;
+use App\Models\SuratKeluar;
 use Asmit\FilamentUpload\Forms\Components\AdvancedFileUpload;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -16,13 +16,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class DokumenKeluarResource extends Resource
+class SuratKeluarResource extends Resource
 {
-    protected static ?string $model = DokumenKeluar::class;
+    protected static ?string $model = SuratKeluar::class;
 
     protected static ?string $navigationGroup = 'Arsip';
 
-    protected static ?string $pluralLabel = 'Dokumen Keluar';
+    protected static ?string $pluralLabel = 'Surat Keluar';
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
 
@@ -126,10 +126,10 @@ class DokumenKeluarResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDokumenKeluars::route('/'),
-            'create' => Pages\CreateDokumenKeluar::route('/create'),
-            'view' => Pages\ViewDokumenKeluar::route('/{record}'),
-            'edit' => Pages\EditDokumenKeluar::route('/{record}/edit'),
+            'index' => Pages\ListSuratKeluars::route('/'),
+            'create' => Pages\CreateSuratKeluar::route('/create'),
+            'view' => Pages\ViewSuratKeluar::route('/{record}'),
+            'edit' => Pages\EditSuratKeluar::route('/{record}/edit'),
         ];
     }
 

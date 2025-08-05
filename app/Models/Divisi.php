@@ -6,13 +6,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class Divisi extends Model
 {
-    public function dokumen()
+    public function surat()
     {
-        return $this->hasMany(DokumenKeluar::class);
+        return $this->hasMany(SuratKeluar::class);
     }
 
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'bagian' => 'array',
+            'kategori' => 'array',
+        ];
     }
 }

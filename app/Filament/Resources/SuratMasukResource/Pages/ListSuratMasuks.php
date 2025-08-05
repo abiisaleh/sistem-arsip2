@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Filament\Resources\DokumenMasukResource\Pages;
+namespace App\Filament\Resources\SuratMasukResource\Pages;
 
-use App\Filament\Resources\DokumenMasukResource;
-use App\Models\DokumenMasuk;
+use App\Filament\Resources\SuratMasukResource;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-class ListDokumenMasuks extends ListRecords
+class ListSuratMasuks extends ListRecords
 {
-    protected static string $resource = DokumenMasukResource::class;
+    protected static string $resource = SuratMasukResource::class;
 
     protected function getHeaderActions(): array
     {

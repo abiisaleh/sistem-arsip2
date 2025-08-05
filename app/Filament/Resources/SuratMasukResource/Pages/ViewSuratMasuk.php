@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\DokumenMasukResource\Pages;
+namespace App\Filament\Resources\SuratMasukResource\Pages;
 
-use App\Filament\Resources\DokumenMasukResource;
+use App\Filament\Resources\SuratMasukResource;
+use App\Models\Divisi;
 use App\Models\User;
 use Asmit\FilamentUpload\Forms\Components\AdvancedFileUpload;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -19,9 +20,9 @@ use PhpOffice\PhpWord\TemplateProcessor;
 
 use function Livewire\store;
 
-class ViewDokumenMasuk extends ViewRecord
+class ViewSuratMasuk extends ViewRecord
 {
-    protected static string $resource = DokumenMasukResource::class;
+    protected static string $resource = SuratMasukResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -40,7 +41,14 @@ class ViewDokumenMasuk extends ViewRecord
                                 ]),
                             Forms\Components\Select::make('divisi_id')
                                 ->native(false)
-                                ->relationship('divisi','judul')
+                                ->relationship('divisi','bagian')
+                                // ->options(fn () =>
+                                //     Divisi::all()->groupBy('judul')->map(fn ($items) =>
+                                //         $items->mapWithKeys(fn ($item) =>
+                                //             [$item->id => $item->bagian]
+                                //         )
+                                //     )
+                                // )
                                 ->multiple()
                                 ->searchable()
                                 ->preload(),

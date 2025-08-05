@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\DokumenMasukResource\Pages;
+namespace App\Filament\Resources\SuratMasukResource\Pages;
 
-use App\Filament\Resources\DokumenMasukResource;
+use App\Filament\Resources\SuratMasukResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
-class CreateDokumenMasuk extends CreateRecord
+class CreateSuratMasuk extends CreateRecord
 {
-    protected static string $resource = DokumenMasukResource::class;
+    protected static string $resource = SuratMasukResource::class;
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {

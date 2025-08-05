@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\Divisi;
-use App\Models\DokumenMasuk;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,9 +13,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('dokumen_masuk_divisi', function (Blueprint $table) {
+        Schema::create('surat_keluars', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(DokumenMasuk::class)->nullable()->constrained()->nullOnDelete();
+            $table->string('nomor')->unique();
+            $table->string('judul');
+            $table->date('tanggal');
+            $table->string('deskripsi');
+            $table->string('file');
+            $table->boolean('is_private')->default(false);
+            $table->foreignIdFor(User::class)->nullable()->constrained()->nullOnDelete();
             $table->foreignIdFor(Divisi::class)->nullable()->constrained()->nullOnDelete();
             $table->timestamps();
         });
@@ -26,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('dokumen_masuk_divisi');
+        Schema::dropIfExists('surat_keluars');
     }
 };

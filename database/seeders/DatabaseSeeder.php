@@ -2,11 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Models\Departemen;
 use App\Models\User;
 use App\Models\Divisi;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+
+use function Pest\Laravel\json;
 
 class DatabaseSeeder extends Seeder
 {
@@ -29,15 +32,41 @@ class DatabaseSeeder extends Seeder
             'role' => 'verifikator'
         ]);
 
-        $judulDivisi = [
-            'KSBU',
-            'KTOKPD',
-            'KASI JASA',
+        $departemen = ['BUMN','PT Freeport'];
+        foreach ($departemen as $judul)
+            Departemen::create(['judul' => $judul]);
+
+        $divisi = [
+            "KSBU" => [
+                "Pengelola Kepegawaian",
+                "Pengelola BMN",
+                "Penyusun Rencana dan Program",
+                "Pengevaluasi dan Penyusunan Laporan",
+                "Tata Usaha",
+            ],
+            "KTOKTP" => [
+                "Koordinator Avsec",
+                "Koordinator PKP-PK",
+                "Koordinator Bangland",
+                "Koordinator Elban",
+                "Koordinator Listrik",
+                "Koordinator A2B",
+                "Tim Slot / Chronos",
+            ],
+            "KASI JASA" => [
+                "Koordinator AMC",
+                "Koordinator Informasi",
+                "Pas Bandara",
+                "Petugas LLAU",
+                "SPI",
+                "Sekretaris",
+            ]
         ];
         $i = 1;
-        foreach ($judulDivisi as $judul) {
+        foreach ($divisi as $judul => $bagian) {
             Divisi::create([
-                'judul' => $judul
+                'judul' => $judul,
+                'bagian' => $bagian
             ]);
 
             User::factory()->create([

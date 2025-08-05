@@ -27,12 +27,13 @@ class DivisiResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('judul')
-                    ->autocomplete(fn () => Divisi::all()->groupBy('judul')->pluck('judul')->toArray())
+                    ->columnSpanFull()
+                    ->datalist(fn () => array_keys(Divisi::all()->groupBy('judul')->toArray()))
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('bagian')
-                    ->required()
-                    ->maxLength(255),
+                Forms\Components\TagsInput::make('bagian'),
+                Forms\Components\TagsInput::make('kategori')
+                    ->label('Kategori dokumen'),
             ]);
     }
 
@@ -42,9 +43,9 @@ class DivisiResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('judul')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('dokumen_count')
-                    ->label('Total Dokumen')
-                    ->counts('dokumen'),
+                Tables\Columns\TextColumn::make('surat_count')
+                    ->label('Total surat')
+                    ->counts('surat'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

@@ -31,21 +31,25 @@ class AdminPanelProvider extends PanelProvider
             ->spa()
             ->id('admin')
             ->path('admin')
-            ->profile(EditProfile::class)
-            ->login(Login::class)
+            ->profile()
+            ->login()
+
+            //custom theme
+            // ->profile(EditProfile::class)
+            // ->login(Login::class)
+            ->viteTheme('resources/css/filament/admin/theme.css')
+
             ->passwordReset()
             ->emailVerification()
             ->darkMode(false)
             ->userMenuItems([
-                MenuItem::make()->label('Users')->icon('heroicon-m-users')->url(fn () => UserResource::getUrl())->visible(fn () => auth()->user()->role == 'admin')
+                MenuItem::make()->label('Users')->icon('heroicon-m-users')->url(fn() => UserResource::getUrl())->visible(fn() => auth()->user()->role == 'admin')
             ])
-            // ->brandLogo(fn () => view('filament.admin.logo'))
             ->brandName(config('app.name'))
             ->sidebarCollapsibleOnDesktop()
             ->colors([
                 'primary' => Color::Sky,
             ])
-            ->viteTheme('resources/css/filament/admin/theme.css')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([

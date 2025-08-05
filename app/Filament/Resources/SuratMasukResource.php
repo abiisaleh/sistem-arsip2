@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\DokumenMasukResource\Pages;
+use App\Filament\Resources\SuratMasukResource\Pages;
+use App\Models\SuratMasuk;
 use App\Models\Divisi;
-use App\Models\DokumenMasuk;
 use App\Models\User;
 use Asmit\FilamentUpload\Forms\Components\AdvancedFileUpload;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -19,15 +19,14 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
-class DokumenMasukResource extends Resource
+class SuratMasukResource extends Resource
 {
-    protected static ?string $model = DokumenMasuk::class;
+    protected static ?string $model = SuratMasuk::class;
 
     protected static ?string $navigationGroup = 'Arsip';
 
-    protected static ?string $pluralLabel = 'Dokumen Masuk';
+    protected static ?string $pluralLabel = 'Surat Masuk';
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box-arrow-down';
 
@@ -41,12 +40,12 @@ class DokumenMasukResource extends Resource
                     ->columns(3)
                     ->schema([
                         Forms\Components\Placeholder::make('Dibuat')
-                            ->content(fn (DokumenMasuk $record) => $record->created_at),
+                            ->content(fn (SuratMasuk $record) => $record->created_at),
                         Forms\Components\Placeholder::make('Diverifikasi')
                             ->key('verifikasi-disposisi')
-                            ->hintAction( fn (DokumenMasuk $record) => 
+                            ->hintAction( fn (SuratMasuk $record) => 
                                 Forms\Components\Actions\Action::make('lihat_disposisi')
-                                    ->infolist(function (DokumenMasuk $record) {
+                                    ->infolist(function (SuratMasuk $record) {
                                         return Infolist::make()
                                             ->record($record)
                                             ->schema([
@@ -62,9 +61,9 @@ class DokumenMasukResource extends Resource
                                     ->hidden(is_null($record->file_disposisi))
                                     ->modal()
                             )
-                            ->content(fn (DokumenMasuk $record) => $record->verified_at ?? 'Menunggu verifikasi'),
+                            ->content(fn (SuratMasuk $record) => $record->verified_at ?? 'Menunggu verifikasi'),
                         Forms\Components\Placeholder::make('Diarsipkan')
-                            ->content(fn (DokumenMasuk $record) => $record->archive_at ?? 'Belum')
+                            ->content(fn (SuratMasuk $record) => $record->archive_at ?? 'Belum')
                     ])->hiddenOn('create'),
                 Forms\Components\Group::make([
                     Forms\Components\TextInput::make('nomor')
@@ -166,10 +165,10 @@ class DokumenMasukResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDokumenMasuks::route('/'),
-            'create' => Pages\CreateDokumenMasuk::route('/create'),
-            'view' => Pages\ViewDokumenMasuk::route('/{record}'),
-            'edit' => Pages\EditDokumenMasuk::route('/{record}/edit'),
+            'index' => Pages\ListSuratMasuks::route('/'),
+            'create' => Pages\CreateSuratMasuk::route('/create'),
+            'view' => Pages\ViewSuratMasuk::route('/{record}'),
+            'edit' => Pages\EditSuratMasuk::route('/{record}/edit'),
         ];
     }
 
@@ -201,10 +200,10 @@ class DokumenMasukResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         if (auth()->user()->role == 'verifikator')
-            $record = DokumenMasuk::all()->where('verified_at',null)->count();
+            $record = SuratMasuk::all()->where('verified_at',null)->count();
         
         if (auth()->user()->role == 'admin') 
-            $record = DokumenMasuk::all()->where('verified_at','!=',null)->where('archive_at',null)->count();
+            $record = SuratMasuk::all()->where('verified_at','!=',null)->where('archive_at',null)->count();
         
         if (auth()->user()->role == 'user') 
             $record = 0;

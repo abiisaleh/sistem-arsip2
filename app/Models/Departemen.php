@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Departemen extends Model
 {
-    public function dokumen()
+    public function surat()
     {
-        return $this->hasMany(DokumenMasuk::class);
+        return $this->hasMany(SuratMasuk::class);
     }
 }
