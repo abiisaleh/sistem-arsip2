@@ -27,11 +27,9 @@ class DivisiResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('judul')
-                    ->columnSpanFull()
-                    ->datalist(fn () => array_keys(Divisi::all()->groupBy('judul')->toArray()))
+                    ->datalist(fn() => array_keys(Divisi::all()->groupBy('judul')->toArray()))
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TagsInput::make('bagian'),
                 Forms\Components\TagsInput::make('kategori')
                     ->label('Kategori dokumen'),
             ]);
@@ -72,7 +70,7 @@ class DivisiResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\UsersRelationManager::class
+            RelationManagers\BagianRelationManager::class
         ];
     }
 
@@ -85,7 +83,7 @@ class DivisiResource extends Resource
         ];
     }
 
-     public static function canCreate(): bool
+    public static function canCreate(): bool
     {
         if (auth()->User()->divisi == null) {
             return true;
@@ -113,5 +111,4 @@ class DivisiResource extends Resource
     {
         return auth()->user()->role === 'admin';
     }
-    
 }

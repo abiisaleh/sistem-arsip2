@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\SuratMasukResource\Pages;
 
 use App\Filament\Resources\SuratMasukResource;
+use App\Models\Bagian;
 use App\Models\Divisi;
 use App\Models\User;
 use Asmit\FilamentUpload\Forms\Components\AdvancedFileUpload;
@@ -13,6 +14,7 @@ use Filament\Actions;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\Settings;
@@ -28,39 +30,36 @@ class ViewSuratMasuk extends ViewRecord
     {
         return [
             Actions\Action::make('disposisi')
-                ->outlined(fn () => auth()->user()->role == 'admin')
+                ->outlined(fn() => auth()->user()->role == 'admin')
                 ->form([
                     Forms\Components\Grid::make()
                         ->schema([
                             Forms\Components\Group::make([
                                 Forms\Components\Select::make('sifat')
-                                ->required()
-                                ->options([
-                                    'segera' => 'Segera',
-                                    'sangat-segera' => 'Sangat Segera'
-                                ]),
-                            Forms\Components\Select::make('divisi_id')
-                                ->native(false)
-                                ->relationship('divisi','bagian')
-                                // ->options(fn () =>
-                                //     Divisi::all()->groupBy('judul')->map(fn ($items) =>
-                                //         $items->mapWithKeys(fn ($item) =>
-                                //             [$item->id => $item->bagian]
-                                //         )
-                                //     )
-                                // )
-                                ->multiple()
-                                ->searchable()
-                                ->preload(),
-                            Forms\Components\TextInput::make('isi_disposisi')
-                                ->required()
-                                ->autocomplete()
-                                ->datalist(fn () => array_keys($this->record->all()->groupBy('isi_disposisi')->toArray())),
-                            Forms\Components\Textarea::make('catatan_disposisi'),
+                                    ->required()
+                                    ->options([
+                                        'segera' => 'Segera',
+                                        'sangat-segera' => 'Sangat Segera'
+                                    ]),
+                                Forms\Components\Select::make('bagian_id')
+                                    ->native(false)
+                                    ->required()
+                                    ->label('Bagian (Divisi)')
+                                    ->relationship('bagian', 'nama')
+                                    ->getOptionLabelFromRecordUsing(fn($record) => "{$record->nama} ({$record->divisi->judul})")
+                                    ->multiple()
+                                    ->searchable()
+                                    ->preload(),
+                                Forms\Components\TextInput::make('isi_disposisi')
+                                    ->required()
+                                    ->autocomplete()
+                                    ->datalist(fn() => array_keys($this->record->all()->groupBy('isi_disposisi')->toArray())),
+                                Forms\Components\Textarea::make('catatan_disposisi'),
                             ]),
                             AdvancedFileUpload::make('file_disposisi')
-                                ->hidden(fn () => auth()->user()->role == 'verifikator')
-                                ->hintAction( fn () => 
+                                ->hidden(fn() => auth()->user()->role == 'verifikator')
+                                ->hintAction(
+                                    fn() =>
                                     Forms\Components\Actions\Action::make('download-disposisi')
                                         ->url(function () {
                                             $templateProcessor = new TemplateProcessor('assets/format-disposisi.docx');
@@ -74,11 +73,11 @@ class ViewSuratMasuk extends ViewRecord
                                                 'deskripsi' => $this->record->deskripsi,
 
                                                 'verified_at' => date('d F Y'),
-                                                'name' => User::all()->where('role','verifikator')->first()->name,
+                                                'name' => User::all()->where('role', 'verifikator')->first()->name,
                                             ];
 
                                             foreach ($data as $key => $value)
-                                                $templateProcessor->setValue($key,$value);
+                                                $templateProcessor->setValue($key, $value);
 
                                             $fileName = "temp/form-disposisi-{$this->record->nomor}";
                                             $templateProcessor->saveAs("{$fileName}.docx");
@@ -99,7 +98,7 @@ class ViewSuratMasuk extends ViewRecord
 
                     if (auth()->user()->role === 'verifikator') {
                         //generate dokumen disposisi 
-                        $pdf = Pdf::loadView('format-disposisi',[
+                        $pdf = Pdf::loadView('format-disposisi', [
                             'id' => $this->record->id,
 
                             'departemen' => $this->record->departemen->judul,
@@ -107,15 +106,15 @@ class ViewSuratMasuk extends ViewRecord
                             'tanggal' => $this->record->tanggal->format('d F Y'),
                             'deskripsi' => $this->record->deskripsi,
 
-                            'sifat' =>$this->record->sifat,
-                            'divisi' =>$this->record->divisi->pluck('judul')->implode(','),
-                            'isi' =>$this->record->isi_disposisi,
-                            'catatan' =>$this->record->catatan_disposisi,
+                            'sifat' => $this->record->sifat,
+                            'divisi' => $this->record->bagian->pluck('nama')->implode(','),
+                            'isi' => $this->record->isi_disposisi,
+                            'catatan' => $this->record->catatan_disposisi,
 
                             'verified_at' => date('d F Y'),
                             'name' => auth()->user()->name,
                         ]);
-                        $fileName="disposisi-{$this->file}";
+                        $fileName = "disposisi-{$this->record->file}";
                         $pdf->setPaper('A4');
                         $pdf->save("storage/{$fileName}");
 
@@ -125,36 +124,36 @@ class ViewSuratMasuk extends ViewRecord
                     return Notification::make()->title(__('filament-panels::resources/pages/edit-record.notifications.saved.title'))->success()->send();
                 })
                 ->color('info')
-                ->hidden(fn () => !is_null($this->record->verified_at)),
+                ->hidden(fn() => !is_null($this->record->verified_at)),
 
             Actions\Action::make('arsip')
                 ->action(function () {
                     $this->record->update(['archive_at' => now()]);
-                    Notification::make()->title(__('filament-panels::resources/pages/edit-record.notifications.saved.title'))->success()->send(); 
-                    return Storage::download('storage/'.$this->record->file_disposisi); 
+                    Notification::make()->title(__('filament-panels::resources/pages/edit-record.notifications.saved.title'))->success()->send();
+                    return response()->download('storage/' . $this->record->file_disposisi);
                 })
-                ->hidden(fn () => is_null($this->record->verified_at) or !is_null($this->record->archive_at))
+                ->hidden(fn() => is_null($this->record->verified_at) or !is_null($this->record->archive_at))
                 ->color('success'),
 
             Actions\EditAction::make()
-                ->hidden(fn () => !is_null($this->record->verified_at)),
+                ->hidden(fn() => !is_null($this->record->verified_at)),
 
             Actions\DeleteAction::make()
-                ->after( function () {
+                ->after(function () {
                     if (Storage::disk('public')->exists($this->record->file))
                         return Storage::disk('public')->delete($this->record->file);
 
                     if (Storage::disk('public')->exists($this->record->file_disposisi))
                         return Storage::disk('public')->delete($this->record->file_disposisi);
                 })
-                ->visible(fn () => auth()->user()->role == 'admin')
+                ->visible(fn() => auth()->user()->role == 'admin')
                 ->hidden(function () {
                     //kalau belum verifikasi tampilkan
                     if ($this->record->verified_at == null)
                         $hidden = false;
-                    
+
                     //kalau sudah verifikasi sembunyikan
-                    else 
+                    else
                         $hidden = true;
 
                     //kalau sudah di arsip tampilkan

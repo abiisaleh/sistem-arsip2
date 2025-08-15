@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Bagian;
 use App\Models\Departemen;
 use App\Models\User;
 use App\Models\Divisi;
@@ -32,7 +33,7 @@ class DatabaseSeeder extends Seeder
             'role' => 'verifikator'
         ]);
 
-        $departemen = ['BUMN','PT Freeport'];
+        $departemen = ['BUMN', 'PT Freeport'];
         foreach ($departemen as $judul)
             Departemen::create(['judul' => $judul]);
 
@@ -64,14 +65,20 @@ class DatabaseSeeder extends Seeder
         ];
         $i = 1;
         foreach ($divisi as $judul => $bagian) {
-            Divisi::create([
+            $divisi = Divisi::create([
                 'judul' => $judul,
-                'bagian' => $bagian
             ]);
 
+            foreach ($bagian as $nama) {
+                Bagian::create([
+                    'nama' => $nama,
+                    'divisi_id' => $divisi->id
+                ]);
+            }
+
             User::factory()->create([
-                'name' => $judul.' user',
-                'email' => Str::slug($judul).'@demo.com',
+                'name' => $judul . ' user',
+                'email' => Str::slug($judul) . '@demo.com',
                 'role' => 'user',
                 'divisi_id' => $i++
             ]);

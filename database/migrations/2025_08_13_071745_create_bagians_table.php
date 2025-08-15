@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Divisi;
-use App\Models\SuratMasuk;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,10 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('surat_masuk_divisi', function (Blueprint $table) {
+        Schema::create('bagians', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(SuratMasuk::class)->nullable()->constrained()->nullOnDelete();
-            $table->foreignIdFor(Divisi::class)->nullable()->constrained()->nullOnDelete();
+            $table->string('nama');
+            $table->foreignIdFor(Divisi::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('surat_masuk_divisi');
+        Schema::dropIfExists('bagians');
     }
 };

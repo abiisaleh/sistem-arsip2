@@ -16,10 +16,14 @@ class Divisi extends Model
         return $this->hasMany(User::class);
     }
 
+    public function bagian()
+    {
+        return $this->hasMany(Bagian::class);
+    }
+
     protected function casts(): array
     {
         return [
-            'bagian' => 'array',
             'kategori' => 'array',
         ];
     }

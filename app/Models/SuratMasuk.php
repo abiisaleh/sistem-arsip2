@@ -23,8 +23,8 @@ class SuratMasuk extends Model
         return $this->belongsTo(Departemen::class);
     }
 
-    public function divisi()
+    public function bagian()
     {
-    return $this->belongsToMany(Divisi::class,'dokumen_masuk_divisi');
+        return $this->belongsToMany(Bagian::class, 'surat_masuk_bagian');
     }
 }
