@@ -25,8 +25,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::unguard();
         FilamentAsset::register([
-            Css::make('tailwind', "https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"),
-            Js::make('alpine-ui', "https://unpkg.com/@alpinejs/ui@3.13.3-beta.1/dist/cdn.min.js")
+            Css::make('custom-filemanager', asset("css/livewire-filemanager/custom.css")),
+            Js::make('tailwind', asset("js/livewire-filemanager/3.4.17.es")),
+            Js::make('alpine-ui', asset("js/livewire-filemanager/cdn.min.js")),
         ]);
     }
 }
