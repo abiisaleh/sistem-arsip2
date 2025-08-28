@@ -13,6 +13,7 @@ use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -73,10 +74,12 @@ class DokumenResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('file_name')
+                    ->searchable()
                     ->icon(fn($record) => $record->icon),
                 Tables\Columns\TextColumn::make('divisi.judul')
                     ->visible(auth()->user()->role == 'admin'),
                 Tables\Columns\TextColumn::make('kategori')
+                    ->searchable()
                     ->badge(),
                 Tables\Columns\IconColumn::make('is_private')
                     ->label('Hidden')
@@ -87,7 +90,17 @@ class DokumenResource extends Resource
                     ->sortable()
             ])
             ->filters([
-                //
+                SelectFilter::make('kategori')
+                    ->options(function () {
+                        $options = [];
+                        $kategori = Dokumen::all()->groupBy('kategori');
+                        if (!$kategori->isEmpty())
+                            foreach ($kategori as $key => $value) {
+                                $options[$key] = $key;
+                            }
+                        return $options;
+                    })
+                    ->attribute('kategori')
             ])
             ->actions([
                 // Tables\Actions\EditAction::make(),
