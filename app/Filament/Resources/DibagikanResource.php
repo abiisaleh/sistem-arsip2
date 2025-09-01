@@ -112,7 +112,8 @@ class DibagikanResource extends Resource
                         ->after(function (Dokumen $record) {
                             if (Storage::disk('public')->exists($record->file_path))
                                 return Storage::disk('public')->delete($record->file_path);
-                        }),
+                        })
+                        ->visible(fn() => auth()->user()->role == 'admin'),
                 ])
             ])
             ->bulkActions([
