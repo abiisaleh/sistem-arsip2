@@ -108,8 +108,13 @@ class DokumenResource extends Resource
 
                         if (auth()->user()->role == 'user')
                             $options = auth()->user()->divisi->kategori;
-                        else
-                            $options = Divisi::query()->find(auth()->user()->divisi->id)->toArray()['kategori'];
+                        else {
+                            $kategori = Dokumen::all()->groupBy('kategori');
+                            if (!$kategori->isEmpty())
+                                foreach ($kategori as $key => $value) {
+                                    $options[$key] = $key;
+                                }
+                        }
 
                         return $options;
                     })
