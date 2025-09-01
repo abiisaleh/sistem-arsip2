@@ -22,4 +22,12 @@
     .fi-widget-tab {
         @apply bg-white;
     }
+
+    .fi-widget-tab {
+        @apply shadow;
+    }
+
+    .fi-widget-tab > div > div {
+        @apply shadow-none;
+    }
 }

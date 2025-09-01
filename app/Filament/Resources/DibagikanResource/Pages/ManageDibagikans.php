@@ -35,7 +35,7 @@ class ManageDibagikans extends ManageRecords
                 $dokumenCount = Dokumen::all()->where('divisi_id', $id)->where('is_private', false)->count();
                 $tab[$judul] = WidgetTab::make()
                     ->label($judul)
-                    ->icon('heroicon-o-folder')
+                    ->icon('heroicon-s-folder')
                     ->value($dokumenCount)
                     ->modifyQueryUsing(fn(Builder $query) => $query->where('divisi_id', $id));
             }
