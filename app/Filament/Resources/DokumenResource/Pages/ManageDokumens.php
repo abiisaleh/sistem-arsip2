@@ -10,8 +10,6 @@ use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ManageRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-use function PHPUnit\Framework\isEmpty;
-
 class ManageDokumens extends ManageRecords
 {
     protected static string $resource = DokumenResource::class;
@@ -21,6 +19,8 @@ class ManageDokumens extends ManageRecords
         return [
             Actions\CreateAction::make()
                 ->mutateFormDataUsing(function ($data) {
+                    $data['user_id'] = auth()->id();
+
                     if (auth()->user()->role == 'user')
                         $data['divisi_id'] = auth()->user()->divisi_id;
 

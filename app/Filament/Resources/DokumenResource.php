@@ -11,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\SelectFilter;
@@ -35,6 +36,8 @@ class DokumenResource extends Resource
         return $form
             ->columns(1)
             ->schema([
+                Forms\Components\TextInput::make('file_name')
+                    ->visibleOn('edit'),
                 Forms\Components\Select::make('divisi_id')
                     ->native(false)
                     ->relationship('divisi', 'judul')
@@ -60,6 +63,7 @@ class DokumenResource extends Resource
                     }),
                 Forms\Components\Toggle::make('is_private')->label('Sembunyikan'),
                 Forms\Components\FileUpload::make('file_path')
+                    ->hiddenOn('edit')
                     ->previewable(false)
                     ->storeFileNamesIn('file_name')
                     ->directory(function (Get $get) {
@@ -78,16 +82,20 @@ class DokumenResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('file_name')
                     ->searchable()
-                    ->icon(fn($record) => $record->icon),
+                    ->sortable()
+                    ->icon(fn($record) => $record->icon)
+                    ->iconColor(Color::Red),
                 Tables\Columns\TextColumn::make('kategori')
                     ->searchable()
                     ->badge(),
-                Tables\Columns\ToggleColumn::make('is_private')
-                    ->label('Sembunyikan'),
+                Tables\Columns\TextColumn::make('size')
+                    ->label('Ukuran'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Diupload')
-                    ->dateTime()
-                    ->sortable()
+                    ->date('d M Y')
+                    ->sortable(),
+                Tables\Columns\ToggleColumn::make('is_private')
+                    ->label('Sembunyikan'),
             ])
             ->filters([
                 SelectFilter::make('kategori')
@@ -103,12 +111,14 @@ class DokumenResource extends Resource
                     ->attribute('kategori')
             ])
             ->actions([
-                // Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('download')
+                    ->hiddenLabel()
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('success')
+                    ->action(fn(Dokumen $record) => response()->download('storage/' . $record->file_path, $record->file_name)),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('download')
-                        ->icon('heroicon-o-arrow-down-tray')
-                        ->color('success')
-                        ->action(fn(Dokumen $record) => response()->download('storage/' . $record->file_path, $record->file_name)),
+                    Tables\Actions\EditAction::make()
+                        ->color('warning'),
                     Tables\Actions\DeleteAction::make()
                         ->after(function (Dokumen $record) {
                             if (Storage::disk('public')->exists($record->file_path))
@@ -126,7 +136,8 @@ class DokumenResource extends Resource
                             }
                         }),
                 ]),
-            ]);
+            ])
+            ->recordAction('download');
     }
 
     public static function getPages(): array

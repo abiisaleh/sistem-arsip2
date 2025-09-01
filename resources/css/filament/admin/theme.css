@@ -1,4 +1,5 @@
 @import "../../../../vendor/filament/filament/resources/css/theme.css";
+@import "../../../../vendor/shkubu18/filament-widget-tabs/resources/css/widget-tabs.css";
 
 @tailwind base;
 @tailwind components;
@@ -16,5 +17,9 @@
 
     .fi-sidebar-nav {
         @apply bg-white dark:bg-gray-900 shadow;
+    }
+
+    .fi-widget-tab {
+        @apply bg-white;
     }
 }

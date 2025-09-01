@@ -5,11 +5,16 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\DibagikanResource\Pages;
 use App\Filament\Resources\DibagikanResource\RelationManagers;
 use App\Models\Dibagikan;
+use App\Models\Divisi;
 use App\Models\Dokumen;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,8 +32,34 @@ class DibagikanResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(1)
             ->schema([
-                //
+                Forms\Components\TextInput::make('file_name')
+                    ->visibleOn('edit'),
+                Forms\Components\Select::make('divisi_id')
+                    ->native(false)
+                    ->relationship('divisi', 'judul')
+                    ->visible(fn() => auth()->user()->role == 'admin')
+                    ->live(),
+                Forms\Components\Select::make('kategori')
+                    ->native(false)
+                    ->disabled(fn(Get $get) => (auth()->user()->role == 'admin') & is_null($get('divisi_id')))
+                    ->options(function (Get $get) {
+                        $data = null;
+
+                        if (auth()->user()->role == 'user')
+                            $data = auth()->user()->divisi->kategori;
+
+                        if (auth()->user()->role == 'admin')
+                            if (!is_null($get('divisi_id')))
+                                $data = Divisi::query()->find($get('divisi_id'))->toArray()['kategori'];
+
+                        if (!is_null($data))
+                            return collect($data)->mapWithKeys(fn($item, $key) => [$item => $item])->all();
+
+                        return [];
+                    }),
+                Forms\Components\Toggle::make('is_private')->label('Sembunyikan'),
             ]);
     }
 
@@ -40,17 +71,22 @@ class DibagikanResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('file_name')
                     ->searchable()
-                    ->icon(fn($record) => $record->icon),
+                    ->sortable()
+                    ->icon(fn($record) => $record->icon)
+                    ->iconColor(Color::Red),
                 Tables\Columns\TextColumn::make('kategori')
                     ->searchable()
                     ->badge(),
+                Tables\Columns\TextColumn::make('size')
+                    ->label('Ukuran'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Diupload')
-                    ->dateTime()
+                    ->date('d M Y')
                     ->sortable()
             ])
             ->filters([
                 SelectFilter::make('kategori')
+                    ->searchable()
                     ->options(function () {
                         $options = [];
                         $kategori = Dokumen::all()->groupBy('kategori');
@@ -60,15 +96,17 @@ class DibagikanResource extends Resource
                             }
                         return $options;
                     })
-                    ->attribute('kategori')
+                    ->attribute('kategori'),
             ])
             ->actions([
-                // Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('download')
+                    ->hiddenLabel()
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('success')
+                    ->action(fn(Dokumen $record) => response()->download('storage/' . $record->file_path, $record->file_name)),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('download')
-                        ->icon('heroicon-o-arrow-down-tray')
-                        ->color('success')
-                        ->action(fn(Dokumen $record) => response()->download('storage/' . $record->file_path, $record->file_name)),
+                    Tables\Actions\EditAction::make()
+                        ->color('warning'),
                     Tables\Actions\DeleteAction::make()
                         ->visible(fn() => auth()->user()->role == 'admin')
                         ->after(function (Dokumen $record) {
@@ -88,7 +126,8 @@ class DibagikanResource extends Resource
                             }
                         }),
                 ]),
-            ]);
+            ])
+            ->recordAction('download');
     }
 
     public static function getPages(): array

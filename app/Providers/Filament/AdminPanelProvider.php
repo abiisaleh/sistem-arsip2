@@ -37,7 +37,7 @@ class AdminPanelProvider extends PanelProvider
             //custom theme
             // ->profile(EditProfile::class)
             // ->login(Login::class)
-            // ->viteTheme('resources/css/filament/admin/theme.css')
+            ->viteTheme('resources/css/filament/admin/theme.css')
 
             ->passwordReset()
             ->emailVerification()
