@@ -9,6 +9,7 @@ use App\Models\Divisi;
 use App\Models\Dokumen;
 use Filament\Facades\Filament;
 use Filament\Forms;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
@@ -73,7 +74,13 @@ class DibagikanResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->icon(fn($record) => $record->icon)
-                    ->iconColor(Color::Red),
+                    ->iconColor(fn($state) => match (pathinfo($state, PATHINFO_EXTENSION)) {
+                        'pdf', 'png', 'jpg', 'jpeg', 'svg', '3gp', 'mp4', 'mkv' => Color::Red,
+                        'doc', 'docx' => Color::Blue,
+                        'xls', 'xlsx' => Color::Green,
+                        'ppt', 'pptx' => Color::Orange,
+                        default => Color::Gray,
+                    }),
                 Tables\Columns\TextColumn::make('kategori')
                     ->searchable()
                     ->badge(),
@@ -112,9 +119,8 @@ class DibagikanResource extends Resource
                         ->after(function (Dokumen $record) {
                             if (Storage::disk('public')->exists($record->file_path))
                                 return Storage::disk('public')->delete($record->file_path);
-                        })
-                        ->visible(fn() => auth()->user()->role == 'admin'),
-                ])
+                        }),
+                ])->visible(fn() => auth()->user()->role == 'admin')
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

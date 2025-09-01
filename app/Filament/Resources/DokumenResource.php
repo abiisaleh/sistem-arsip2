@@ -6,6 +6,7 @@ use App\Filament\Resources\DokumenResource\Pages;
 use App\Filament\Resources\DokumenResource\RelationManagers;
 use App\Models\Divisi;
 use App\Models\Dokumen;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -40,11 +41,13 @@ class DokumenResource extends Resource
                     ->visibleOn('edit'),
                 Forms\Components\Select::make('divisi_id')
                     ->native(false)
+                    ->required()
                     ->relationship('divisi', 'judul')
                     ->visible(fn() => auth()->user()->role == 'admin')
                     ->live(),
                 Forms\Components\Select::make('kategori')
                     ->native(false)
+                    ->required()
                     ->disabled(fn(Get $get) => (auth()->user()->role == 'admin') & is_null($get('divisi_id')))
                     ->options(function (Get $get) {
                         $data = null;
@@ -63,6 +66,7 @@ class DokumenResource extends Resource
                     }),
                 Forms\Components\Toggle::make('is_private')->label('Sembunyikan'),
                 Forms\Components\FileUpload::make('file_path')
+                    ->label('File')
                     ->hiddenOn('edit')
                     ->previewable(false)
                     ->storeFileNamesIn('file_name')
@@ -101,14 +105,16 @@ class DokumenResource extends Resource
                 SelectFilter::make('kategori')
                     ->options(function () {
                         $options = [];
-                        $kategori = Dokumen::all()->groupBy('kategori');
-                        if (!$kategori->isEmpty())
-                            foreach ($kategori as $key => $value) {
-                                $options[$key] = $key;
-                            }
+
+                        if (auth()->user()->role == 'user')
+                            $options = auth()->user()->divisi->kategori;
+                        else
+                            $options = Divisi::query()->find(auth()->user()->divisi->id)->toArray()['kategori'];
+
                         return $options;
                     })
                     ->attribute('kategori')
+                    ->searchable()
             ])
             ->actions([
                 Tables\Actions\Action::make('download')
@@ -118,6 +124,7 @@ class DokumenResource extends Resource
                     ->action(fn(Dokumen $record) => response()->download('storage/' . $record->file_path, $record->file_name)),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make()
+                        ->modalWidth('sm')
                         ->color('warning'),
                     Tables\Actions\DeleteAction::make()
                         ->after(function (Dokumen $record) {

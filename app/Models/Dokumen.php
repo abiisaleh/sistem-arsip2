@@ -15,8 +15,15 @@ class Dokumen extends Model
 
     public function getIconAttribute()
     {
-        $ext = pathinfo($this->file_name, PATHINFO_EXTENSION);
-        return 'bi-filetype-' . $ext;
+        $extension = pathinfo($this->file_name, PATHINFO_EXTENSION);
+        return match ($extension) {
+            'png', 'jpg', 'jpeg', 'svg' => 'heroicon-c-photo',
+            '3gp', 'mp4', 'mkv' => 'heroicon-c-film',
+            'pdf', 'doc', 'docx' => 'heroicon-c-document-text',
+            'xls', 'xlsx' => 'heroicon-c-table-cells',
+            'ppt', 'pptx' => 'heroicon-c-presentation-chart-bar',
+            default => 'heroicon-c-document',
+        };
     }
 
     public function getSizeAttribute()
