@@ -75,7 +75,7 @@ class DibagikanResource extends Resource
                     ->sortable()
                     ->icon(fn($record) => $record->icon)
                     ->iconColor(fn($state) => match (pathinfo($state, PATHINFO_EXTENSION)) {
-                        'pdf', 'png', 'jpg', 'jpeg', 'svg', '3gp', 'mp4', 'mkv' => Color::Red,
+                        'pdf', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'mp3', 'wav', 'flac', 'acc', 'ogg', 'mp4', 'mov', 'avi', 'mkv', 'wmv' => Color::Red,
                         'doc', 'docx' => Color::Blue,
                         'xls', 'xlsx' => Color::Green,
                         'ppt', 'pptx' => Color::Orange,

@@ -88,7 +88,13 @@ class DokumenResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->icon(fn($record) => $record->icon)
-                    ->iconColor(Color::Red),
+                    ->iconColor(fn($state) => match (pathinfo($state, PATHINFO_EXTENSION)) {
+                        'pdf', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'mp3', 'wav', 'flac', 'acc', 'ogg', 'mp4', 'mov', 'avi', 'mkv', 'wmv' => Color::Red,
+                        'doc', 'docx' => Color::Blue,
+                        'xls', 'xlsx' => Color::Green,
+                        'ppt', 'pptx' => Color::Orange,
+                        default => Color::Gray,
+                    }),
                 Tables\Columns\TextColumn::make('kategori')
                     ->searchable()
                     ->badge(),
