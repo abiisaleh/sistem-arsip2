@@ -27,22 +27,21 @@ class ManageDibagikans extends ManageRecords
 
     public function getWidgetTabs(): array
     {
-        if (auth()->user()->role == 'admin') {
-            $divisi = Divisi::all()->pluck('judul', 'id');
+        $divisi = Divisi::all()->pluck('judul', 'id');
 
-
-            foreach ($divisi as $id => $judul) {
+        foreach ($divisi as $id => $judul) {
+            if (auth()->user()->role == 'user')
                 $dokumenCount = Dokumen::all()->where('divisi_id', $id)->where('is_private', false)->count();
-                $tab[$judul] = WidgetTab::make()
-                    ->label($judul)
-                    ->icon('heroicon-s-folder')
-                    ->value($dokumenCount)
-                    ->modifyQueryUsing(fn(Builder $query) => $query->where('divisi_id', $id));
-            }
+            else
+                $dokumenCount = Dokumen::all()->where('divisi_id', $id)->count();
 
-            return $tab;
+            $tab[$judul] = WidgetTab::make()
+                ->label($judul)
+                ->icon('heroicon-s-folder')
+                ->value($dokumenCount)
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('divisi_id', $id));
         }
 
-        return [];
+        return $tab;
     }
 }

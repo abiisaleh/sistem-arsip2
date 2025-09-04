@@ -26,11 +26,13 @@ class DokumenResource extends Resource
 {
     protected static ?string $model = Dokumen::class;
 
-    protected static ?string $navigationGroup = 'Arsip';
+    protected static ?string $navigationGroup = 'Drive';
 
     protected static ?string $label = 'Dokumen Saya';
 
     protected static ?string $navigationIcon = 'heroicon-o-folder';
+
+    protected static ?string $recordTitleAttribute = 'file_name';
 
     public static function form(Form $form): Form
     {
@@ -66,6 +68,7 @@ class DokumenResource extends Resource
                     }),
                 Forms\Components\Toggle::make('is_private')->label('Sembunyikan'),
                 Forms\Components\FileUpload::make('file_path')
+                    ->required()
                     ->label('File')
                     ->hiddenOn('edit')
                     ->previewable(false)

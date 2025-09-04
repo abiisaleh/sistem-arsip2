@@ -70,7 +70,7 @@ class DivisiResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\BagianRelationManager::class
+            RelationManagers\BagianRelationManager::class,
         ];
     }
 

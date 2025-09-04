@@ -26,9 +26,11 @@ class DibagikanResource extends Resource
 {
     protected static ?string $model = Dokumen::class;
 
-    protected static ?string $navigationGroup = 'Arsip';
+    protected static ?string $navigationGroup = 'Drive';
 
     protected static ?string $navigationIcon = 'heroicon-o-folder-open';
+
+    protected static ?string $recordTitleAttribute = 'file_name';
 
     public static function form(Form $form): Form
     {
@@ -67,7 +69,7 @@ class DibagikanResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn(Builder $query) => $query->where('is_private', false))
+            ->modifyQueryUsing(fn(Builder $query) => (auth()->user()->role == 'user') ? $query->where('is_private', false) : $query)
             ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('file_name')

@@ -20,7 +20,7 @@ class SuratKeluarResource extends Resource
 {
     protected static ?string $model = SuratKeluar::class;
 
-    protected static ?string $navigationGroup = 'Arsip';
+    protected static ?string $navigationGroup = 'Surat';
 
     protected static ?string $pluralLabel = 'Surat Keluar';
 
@@ -35,7 +35,7 @@ class SuratKeluarResource extends Resource
                 Forms\Components\Group::make([
                     Forms\Components\TextInput::make('nomor')
                         ->unique()
-                        ->hiddenOn(['edit','view'])
+                        ->hiddenOn(['edit', 'view'])
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('judul')
@@ -45,7 +45,7 @@ class SuratKeluarResource extends Resource
                         ->required(),
                     Forms\Components\Select::make('divisi_id')
                         ->native(false)
-                        ->relationship('divisi','judul')
+                        ->relationship('divisi', 'judul')
                         ->createOptionForm([
                             Forms\Components\TextInput::make('judul'),
                         ])
@@ -63,7 +63,7 @@ class SuratKeluarResource extends Resource
                 ]),
                 AdvancedFileUpload::make('file')
                     ->openable()
-                    ->acceptedFileTypes(['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.wordprocessingml.spreadsheetml.sheet'])
+                    ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.wordprocessingml.spreadsheetml.sheet'])
                     ->pdfDisplayPage(1)
                     ->pdfToolbar(false)
                     ->pdfNavPanes(false)
@@ -77,7 +77,7 @@ class SuratKeluarResource extends Resource
         return $table
             ->modifyQueryUsing(function (Builder $query) {
                 if (auth()->user()->divisi_id != null)
-                    $query->where('divisi_id', auth()->user()->divisi_id)->orWhere('is_private',false);
+                    $query->where('divisi_id', auth()->user()->divisi_id)->orWhere('is_private', false);
             })
             ->columns([
                 Tables\Columns\TextColumn::make('nomor')
@@ -135,14 +135,14 @@ class SuratKeluarResource extends Resource
 
     public static function getGlobalSearchResultTitle(Model $record): string|Htmlable
     {
-        return $record->nomor." | ".$record->judul;
+        return $record->nomor . " | " . $record->judul;
     }
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['nomor','judul','deskripsi','divisi.judul'];
+        return ['nomor', 'judul', 'deskripsi', 'divisi.judul'];
     }
-    
+
     public static function canEdit(Model $record): bool
     {
         return $record->user->id == auth()->user()->id;
@@ -150,9 +150,9 @@ class SuratKeluarResource extends Resource
 
     public static function canDelete(Model $record): bool
     {
-       return $record->user->id == auth()->user()->id;
+        return $record->user->id == auth()->user()->id;
     }
-    
+
     public static function canDeleteAny(): bool
     {
         return auth()->user()->divisi == null;

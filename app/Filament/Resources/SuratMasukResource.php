@@ -24,7 +24,7 @@ class SuratMasukResource extends Resource
 {
     protected static ?string $model = SuratMasuk::class;
 
-    protected static ?string $navigationGroup = 'Arsip';
+    protected static ?string $navigationGroup = 'Surat';
 
     protected static ?string $pluralLabel = 'Surat Masuk';
 
