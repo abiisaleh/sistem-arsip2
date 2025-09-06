@@ -30,8 +30,6 @@ class DivisiResource extends Resource
                     ->datalist(fn() => array_keys(Divisi::all()->groupBy('judul')->toArray()))
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TagsInput::make('kategori')
-                    ->label('Kategori dokumen'),
             ]);
     }
 

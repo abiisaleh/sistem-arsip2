@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Divisi;
+use App\Models\kategori;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -15,9 +16,8 @@ return new class extends Migration
     {
         Schema::create('dokumens', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Divisi::class)->nullable()->constrained()->nullOnDelete();
+            $table->foreignIdFor(kategori::class)->nullable()->constrained()->nullOnDelete();
             $table->foreignIdFor(User::class)->nullable()->constrained()->nullOnDelete();
-            $table->string('kategori');
             $table->boolean('is_private')->default(false);
             $table->string('file_path');
             $table->string('file_name');

@@ -33,7 +33,8 @@ class DokumenTerbaru extends BaseWidget
                         'ppt', 'pptx' => Color::Orange,
                         default => Color::Gray,
                     }),
-                Tables\Columns\TextColumn::make('kategori')
+                Tables\Columns\TextColumn::make('kategori.name')
+                    ->label('Folder')
                     ->badge(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()

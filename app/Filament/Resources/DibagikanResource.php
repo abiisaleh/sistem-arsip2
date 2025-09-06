@@ -83,7 +83,8 @@ class DibagikanResource extends Resource
                         'ppt', 'pptx' => Color::Orange,
                         default => Color::Gray,
                     }),
-                Tables\Columns\TextColumn::make('kategori')
+                Tables\Columns\TextColumn::make('kategori.name')
+                    ->label('Folder')
                     ->searchable()
                     ->badge(),
                 Tables\Columns\TextColumn::make('size')

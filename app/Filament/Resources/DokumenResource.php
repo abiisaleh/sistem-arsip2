@@ -6,11 +6,13 @@ use App\Filament\Resources\DokumenResource\Pages;
 use App\Filament\Resources\DokumenResource\RelationManagers;
 use App\Models\Divisi;
 use App\Models\Dokumen;
+use App\Models\kategori;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Tables;
@@ -24,7 +26,7 @@ use Illuminate\Support\Facades\Storage;
 
 class DokumenResource extends Resource
 {
-    protected static ?string $model = Dokumen::class;
+    protected static ?string $model = kategori::class;
 
     protected static ?string $navigationGroup = 'Drive';
 
@@ -32,52 +34,24 @@ class DokumenResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-folder';
 
-    protected static ?string $recordTitleAttribute = 'file_name';
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Form $form): Form
     {
         return $form
             ->columns(1)
             ->schema([
-                Forms\Components\TextInput::make('file_name')
-                    ->visibleOn('edit'),
                 Forms\Components\Select::make('divisi_id')
+                    ->label('Divisi')
+                    ->options(fn() => Divisi::all()->pluck('judul', 'id')->toArray())
+                    ->hidden(fn() => auth()->user()->role == 'user')
+                    ->hiddenOn('view')
                     ->native(false)
-                    ->required()
-                    ->relationship('divisi', 'judul')
-                    ->visible(fn() => auth()->user()->role == 'admin')
-                    ->live(),
-                Forms\Components\Select::make('kategori')
-                    ->native(false)
-                    ->required()
-                    ->disabled(fn(Get $get) => (auth()->user()->role == 'admin') & is_null($get('divisi_id')))
-                    ->options(function (Get $get) {
-                        $data = null;
-
-                        if (auth()->user()->role == 'user')
-                            $data = auth()->user()->divisi->kategori;
-
-                        if (auth()->user()->role == 'admin')
-                            if (!is_null($get('divisi_id')))
-                                $data = Divisi::query()->find($get('divisi_id'))->toArray()['kategori'];
-
-                        if (!is_null($data))
-                            return collect($data)->mapWithKeys(fn($item, $key) => [$item => $item])->all();
-
-                        return [];
-                    }),
-                Forms\Components\Toggle::make('is_private')->label('Sembunyikan'),
-                Forms\Components\FileUpload::make('file_path')
-                    ->required()
-                    ->label('File')
-                    ->hiddenOn('edit')
-                    ->previewable(false)
-                    ->storeFileNamesIn('file_name')
-                    ->directory(function (Get $get) {
-                        $divisi = (auth()->user()->role == 'admin') ? Divisi::find($get('divisi_id'))->judul : auth()->user()->divisi->judul;
-                        return now()->year . '/' . $divisi . '/' . $get('kategori');
-                    })
-                    ->multiple(),
+                    ->required(),
+                Forms\Components\TextInput::make('name')
+                    ->label('Nama folder')
+                    ->hiddenOn('view')
+                    ->required(),
             ]);
     }
 
@@ -87,59 +61,29 @@ class DokumenResource extends Resource
             ->modifyQueryUsing(fn(Builder $query) => $query->where('user_id', auth()->id()))
             ->defaultSort('created_at', 'desc')
             ->columns([
-                Tables\Columns\TextColumn::make('file_name')
+                Tables\Columns\TextColumn::make('name')
                     ->searchable()
-                    ->sortable()
-                    ->icon(fn($record) => $record->icon)
-                    ->iconColor(fn($state) => match (pathinfo($state, PATHINFO_EXTENSION)) {
-                        'pdf', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'mp3', 'wav', 'flac', 'acc', 'ogg', 'mp4', 'mov', 'avi', 'mkv', 'wmv' => Color::Red,
-                        'doc', 'docx' => Color::Blue,
-                        'xls', 'xlsx' => Color::Green,
-                        'ppt', 'pptx' => Color::Orange,
-                        default => Color::Gray,
-                    }),
-                Tables\Columns\TextColumn::make('kategori')
-                    ->searchable()
-                    ->badge(),
-                Tables\Columns\TextColumn::make('size')
-                    ->label('Ukuran'),
+                    ->label('Folder')
+                    ->icon('heroicon-c-folder')
+                    ->iconColor('primary'),
+                Tables\Columns\TextColumn::make('divisi.judul')
+                    ->hidden(fn() => auth()->user()->role == 'user'),
+                Tables\Columns\TextColumn::make('dokumens_count')
+                    ->label('Total file')
+                    ->counts('dokumens'),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Diupload')
+                    ->label('Dibuat')
                     ->date('d M Y')
                     ->sortable(),
-                Tables\Columns\ToggleColumn::make('is_private')
-                    ->label('Sembunyikan'),
             ])
-            ->filters([
-                SelectFilter::make('kategori')
-                    ->options(function () {
-                        $options = [];
-
-                        if (auth()->user()->role == 'user')
-                            $options = auth()->user()->divisi->kategori;
-                        else {
-                            $kategori = Dokumen::all()->groupBy('kategori');
-                            if (!$kategori->isEmpty())
-                                foreach ($kategori as $key => $value) {
-                                    $options[$key] = $key;
-                                }
-                        }
-
-                        return $options;
-                    })
-                    ->attribute('kategori')
-                    ->searchable()
-            ])
+            ->filters([])
             ->actions([
-                Tables\Actions\Action::make('download')
-                    ->hiddenLabel()
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->color('success')
-                    ->action(fn(Dokumen $record) => response()->download('storage/' . $record->file_path, $record->file_name)),
                 Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make()
+                        ->color('primary'),
                     Tables\Actions\EditAction::make()
-                        ->modalWidth('sm')
-                        ->color('warning'),
+                        ->color('warning')
+                        ->modalWidth('sm'),
                     Tables\Actions\DeleteAction::make()
                         ->after(function (Dokumen $record) {
                             if (Storage::disk('public')->exists($record->file_path))
@@ -157,14 +101,21 @@ class DokumenResource extends Resource
                             }
                         }),
                 ]),
-            ])
-            ->recordAction('download');
+            ]);
     }
 
     public static function getPages(): array
     {
         return [
             'index' => Pages\ManageDokumens::route('/'),
+            'view' => Pages\ListFiles::route('/{record}/files'),
+        ];
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\DokumenRelationManager::class,
         ];
     }
 }

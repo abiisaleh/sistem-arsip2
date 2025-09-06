@@ -20,9 +20,7 @@ class ManageDibagikans extends ManageRecords
 
     protected function getHeaderActions(): array
     {
-        return [
-            // Actions\CreateAction::make(),
-        ];
+        return [];
     }
 
     public function getWidgetTabs(): array
@@ -30,16 +28,18 @@ class ManageDibagikans extends ManageRecords
         $divisi = Divisi::all()->pluck('judul', 'id');
 
         foreach ($divisi as $id => $judul) {
+            $dokumen =  Dokumen::query()->whereHas('divisi', fn($query) => $query->where('divisi_id', $id));
+
             if (auth()->user()->role == 'user')
-                $dokumenCount = Dokumen::all()->where('divisi_id', $id)->where('is_private', false)->count();
+                $dokumenCount = $dokumen->where('is_private', false)->count();
             else
-                $dokumenCount = Dokumen::all()->where('divisi_id', $id)->count();
+                $dokumenCount = $dokumen->count();
 
             $tab[$judul] = WidgetTab::make()
                 ->label($judul)
                 ->icon('heroicon-s-folder')
                 ->value($dokumenCount)
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('divisi_id', $id));
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereHas('divisi', fn($query) => $query->where('divisi_id', $id)));
         }
 
         return $tab;

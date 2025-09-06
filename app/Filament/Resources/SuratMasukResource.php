@@ -213,7 +213,7 @@ class SuratMasukResource extends Resource
             $record = SuratMasuk::all()->where('verified_at', '!=', null)->where('archive_at', null)->count();
 
         if (auth()->user()->role == 'user')
-            $record = SuratMasuk::all()->toQuery()->whereHas('bagian', function ($query) {
+            $record = SuratMasuk::query()->whereHas('bagian', function ($query) {
                 $query->whereHas('divisi', function ($query) {
                     $query->where('id', auth()->user()->divisi_id);
                 });

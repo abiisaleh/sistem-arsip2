@@ -3,14 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Number;
 
 class Dokumen extends Model
 {
-    public function divisi()
+    public function kategori()
     {
-        return $this->belongsTo(Divisi::class);
+        return $this->belongsTo(kategori::class);
+    }
+
+    public function divisi(): HasOneThrough
+    {
+        return $this->hasOneThrough(Divisi::class, kategori::class, 'id', 'id', 'kategori_id', 'divisi_id');
     }
 
     public function getIconAttribute()

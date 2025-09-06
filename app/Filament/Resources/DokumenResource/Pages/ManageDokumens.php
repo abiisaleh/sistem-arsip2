@@ -3,12 +3,8 @@
 namespace App\Filament\Resources\DokumenResource\Pages;
 
 use App\Filament\Resources\DokumenResource;
-use App\Models\Divisi;
-use App\Models\Dokumen;
 use Filament\Actions;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ManageRecords;
-use Illuminate\Database\Eloquent\Builder;
 
 class ManageDokumens extends ManageRecords
 {
@@ -18,38 +14,18 @@ class ManageDokumens extends ManageRecords
     {
         return [
             Actions\CreateAction::make()
+                ->label('Buat Folder')
                 ->mutateFormDataUsing(function ($data) {
                     $data['user_id'] = auth()->id();
 
                     if (auth()->user()->role == 'user')
                         $data['divisi_id'] = auth()->user()->divisi_id;
 
-                    $files = $data['file_name'];
-                    $firstFilePath = array_keys($files)[0];
-                    $firstFileName = array_shift($files);
-
-                    if (!empty($files)) {
-                        foreach ($files as $filePath => $fileName) {
-                            $newData = $data;
-                            $newData['file_path'] = $filePath;
-                            $newData['file_name'] = $fileName;
-                            $newData['created_at'] = now();
-                            $newData['updated_at'] = now();
-                            $datas[] = $newData;
-                        }
-
-                        Dokumen::insert($datas);
-                    }
-
-                    $data['file_path'] = $firstFilePath;
-                    $data['file_name'] = $firstFileName;
                     return $data;
                 })
                 ->createAnother(false)
-                ->label('Upload')
                 ->modalWidth('md')
-                ->modalHeading('Upload Dokumen')
-                ->modalSubmitActionLabel('Upload'),
+                ->modalHeading('Buat Folder baru')
         ];
     }
 }
