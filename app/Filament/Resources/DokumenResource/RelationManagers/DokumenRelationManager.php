@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\DokumenResource\RelationManagers;
 
 use App\Models\Dokumen;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -11,6 +12,7 @@ use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
 
@@ -68,7 +70,37 @@ class DokumenRelationManager extends RelationManager
                     ->label('Sembunyikan'),
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('periode')
+                    ->columns(2)
+                    ->form([
+                        Forms\Components\Select::make('tahun')
+                            ->hiddenLabel()
+                            ->placeholder('Tahun')
+                            ->searchable()
+                            ->options(function () {
+                                $startYear = 2024;
+                                $endYear = now()->year;
+                                for ($i = $startYear; $i <= $endYear; $i++)
+                                    $options[$i] = $i;
+
+                                return $options;
+                            }),
+                        Forms\Components\Select::make('bulan')
+                            ->hiddenLabel()
+                            ->placeholder('Bulan')
+                            ->native(false)
+                            ->options(function () {
+                                for ($i = 1; $i <= 12; $i++)
+                                    $options[$i] = Carbon::create(null, $i)->monthName;
+                                return $options;
+                            })
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if ($data['tahun'])
+                            $query->whereYear('created_at', $data['tahun']);
+                        if ($data['bulan'])
+                            $query->whereMonth('created_at', $data['bulan']);
+                    })
             ])
             ->actions([
                 Tables\Actions\Action::make('download')
@@ -89,7 +121,13 @@ class DokumenRelationManager extends RelationManager
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->after(function (Collection $record) {
+                            foreach ($record as $dokumen) {
+                                if (Storage::disk('public')->exists($dokumen->file_path))
+                                    return Storage::disk('public')->delete($dokumen->file_path);
+                            }
+                        }),
                 ]),
             ])
             ->recordAction('download');

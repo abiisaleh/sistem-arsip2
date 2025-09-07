@@ -92,15 +92,7 @@ class DokumenResource extends Resource
                 ])
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
-                        ->after(function (Collection $record) {
-                            foreach ($record as $dokumen) {
-                                if (Storage::disk('public')->exists($dokumen->file_path))
-                                    return Storage::disk('public')->delete($dokumen->file_path);
-                            }
-                        }),
-                ]),
+                //
             ]);
     }
 

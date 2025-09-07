@@ -52,9 +52,9 @@ class UserResource extends Resource
                     ->required(),
                 Forms\Components\Select::make('divisi_id')
                     ->required()
-                    ->visible(fn (Get $get) => $get('role') === 'user')
+                    ->visible(fn(Get $get) => $get('role') === 'user')
                     ->native(false)
-                    ->relationship('divisi','judul')
+                    ->relationship('divisi', 'judul')
                     ->searchable()
                     ->preload(),
             ]);
@@ -83,7 +83,11 @@ class UserResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make()
+                        ->color('primary'),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

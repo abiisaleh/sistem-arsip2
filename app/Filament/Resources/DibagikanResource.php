@@ -7,9 +7,12 @@ use App\Filament\Resources\DibagikanResource\RelationManagers;
 use App\Models\Dibagikan;
 use App\Models\Divisi;
 use App\Models\Dokumen;
+use App\Models\kategori;
+use Carbon\Carbon;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
@@ -95,18 +98,45 @@ class DibagikanResource extends Resource
                     ->sortable()
             ])
             ->filters([
-                SelectFilter::make('kategori')
+                SelectFilter::make('folder')
                     ->searchable()
                     ->options(function () {
-                        $options = [];
-                        $kategori = Dokumen::all()->groupBy('kategori');
-                        if (!$kategori->isEmpty())
-                            foreach ($kategori as $key => $value) {
-                                $options[$key] = $key;
-                            }
+                        foreach (Divisi::all() as $divisi)
+                            $options[$divisi->judul] = kategori::all()->where('divisi_id', $divisi->id)->pluck('name', 'id')->toArray();
                         return $options;
                     })
-                    ->attribute('kategori'),
+                    ->attribute('kategori_id'),
+                Filter::make('periode')
+                    ->columns(2)
+                    ->form([
+                        Forms\Components\Select::make('tahun')
+                            ->hiddenLabel()
+                            ->placeholder('Tahun')
+                            ->searchable()
+                            ->options(function () {
+                                $startYear = 2024;
+                                $endYear = now()->year;
+                                for ($i = $startYear; $i <= $endYear; $i++)
+                                    $options[$i] = $i;
+
+                                return $options;
+                            }),
+                        Forms\Components\Select::make('bulan')
+                            ->hiddenLabel()
+                            ->placeholder('Bulan')
+                            ->native(false)
+                            ->options(function () {
+                                for ($i = 1; $i <= 12; $i++)
+                                    $options[$i] = Carbon::create(null, $i)->monthName;
+                                return $options;
+                            })
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if ($data['tahun'])
+                            $query->whereYear('created_at', $data['tahun']);
+                        if ($data['bulan'])
+                            $query->whereMonth('created_at', $data['bulan']);
+                    })
             ])
             ->actions([
                 Tables\Actions\Action::make('download')
