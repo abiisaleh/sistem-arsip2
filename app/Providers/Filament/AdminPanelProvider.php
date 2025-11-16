@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Resources\UserResource;
+use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -42,6 +43,7 @@ class AdminPanelProvider extends PanelProvider
             ->passwordReset()
             ->emailVerification()
             ->darkMode(false)
+            ->defaultThemeMode(ThemeMode::Light)
             ->userMenuItems([
                 MenuItem::make()->label('Users')->icon('heroicon-m-users')->url(fn() => UserResource::getUrl())->visible(fn() => auth()->user()->role == 'admin')
             ])
